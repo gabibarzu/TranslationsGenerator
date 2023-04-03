@@ -1,4 +1,5 @@
 import csv
+import sys
 
 
 def generateHeader(area):
@@ -21,25 +22,38 @@ EXEC InsertOrUpdateResourceTranslation @LanguageIdForNL, @Area, @ResourceKey, '{
 """
 
 
-def generateTranslations(file_name, area, skip_header=True):
-    with open(file_name) as csv_file:
-        csv_reader = csv.reader(csv_file, delimiter=',')
-        line_count = 0
-        with open('output.sql', 'w') as f:
-            f.write(generateHeader(area))
-            for row in csv_reader:
-                if line_count == 0 and skip_header:
+def generateTranslations(area, file_name='translations.csv', skip_header=True):
+    try:
+        with open(file_name) as csv_file:
+            csv_reader = csv.reader(csv_file, delimiter=',')
+            line_count = 0
+            generated_translations = 0
+            with open('output.sql', 'w') as f:
+                f.write(generateHeader(area))
+                for row in csv_reader:
+                    if line_count == 0 and skip_header:
+                        line_count += 1
+                        continue
+                    label = row[0]
+                    en_translation = row[1]
+                    nl_translation = row[2]
+                    resource_key = row[3]
+                    f.write(generateTranslation(
+                        label, en_translation, nl_translation, resource_key))
+                    generated_translations += 1
                     line_count += 1
-                    continue
-                label = row[0]
-                en_translation = row[1]
-                nl_translation = row[2]
-                resource_key = row[3]
-                f.write(generateTranslation(
-                    label, en_translation, nl_translation, resource_key))
-                line_count += 1
+        print(f"{generated_translations} translations generated.")
+    except IOError:
+        print("Please provide an existing input file.")
 
 
-file_name = 'translations.csv'
-area = 'Area'
-generateTranslations(file_name, area)
+if (len(sys.argv) < 2):
+    print("Please provide the area. The command should be *** python generator.py \"Area\" ***")
+else:
+    if (len(sys.argv) < 3):
+        generateTranslations(sys.argv[1])
+    elif (len(sys.argv) < 4):
+        generateTranslations(sys.argv[1], sys.argv[2])
+    else:
+        skip_header = sys.argv[3].lower() == 'true'
+        generateTranslations(sys.argv[1], sys.argv[2], skip_header)

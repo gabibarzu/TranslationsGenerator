@@ -4,13 +4,16 @@ This tool can be used to generate a list of translations based on an input csv f
 
 ## Execution
 
-Using the python command `python generator.py` and with an existing CSV file.
-For the csv file, the first line will the csv header, but i can be skyped without if parameter `skip_header` will be set to `False`
+### Parameters
+- `area` -> Area for the resource
+- `file_name` -> The input for the translations that should be generated
+- `skip_header` -> Flag that will skip the header for the csv input file
 
-In the `generator.py` file, set the parameters:
-```
-file_name = 'translations.csv'
-area = 'Area'
-```
+Using the python command `python generator.py "Area"` and with an existing CSV file.
+
+### Additional runnings example
+- `python generator.py "Area"`
+- `python generator.py "Area" "translations.csv"`
+- `python generator.py "Area" "translations.csv" True`
 
 The output will be placed in the `output.sql` file.
